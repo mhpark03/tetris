@@ -127,7 +127,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Speed: ${1000 - (_gameBoard.startLevel - 1) * 100}ms',
+                'Speed: ${500 - (_gameBoard.startLevel - 1) * 50}ms',
                 style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
               ),
             ],
