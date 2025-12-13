@@ -307,36 +307,46 @@ class _GameScreenState extends State<GameScreen> {
               ),
               // Controls
               Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // Move left
-                    HoldControlButton(
-                      icon: Icons.arrow_left,
-                      onPressed: _gameBoard.moveLeft,
-                    ),
-                    // Rotate left
-                    ControlButton(
-                      icon: Icons.rotate_left,
-                      onPressed: _gameBoard.rotateLeft,
-                    ),
-                    // Hard drop
-                    ControlButton(
-                      icon: Icons.vertical_align_bottom,
-                      onPressed: _gameBoard.hardDrop,
-                    ),
-                    // Rotate right
-                    ControlButton(
-                      icon: Icons.rotate_right,
-                      onPressed: _gameBoard.rotate,
-                    ),
-                    // Move right
-                    HoldControlButton(
-                      icon: Icons.arrow_right,
-                      onPressed: _gameBoard.moveRight,
-                    ),
-                  ],
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final buttonSize = (constraints.maxWidth - 32) / 5; // 5 buttons with gaps
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Move left
+                        HoldControlButton(
+                          icon: Icons.arrow_left,
+                          onPressed: _gameBoard.moveLeft,
+                          size: buttonSize,
+                        ),
+                        // Rotate left
+                        ControlButton(
+                          icon: Icons.rotate_left,
+                          onPressed: _gameBoard.rotateLeft,
+                          size: buttonSize,
+                        ),
+                        // Hard drop
+                        ControlButton(
+                          icon: Icons.vertical_align_bottom,
+                          onPressed: _gameBoard.hardDrop,
+                          size: buttonSize,
+                        ),
+                        // Rotate right
+                        ControlButton(
+                          icon: Icons.rotate_right,
+                          onPressed: _gameBoard.rotate,
+                          size: buttonSize,
+                        ),
+                        // Move right
+                        HoldControlButton(
+                          icon: Icons.arrow_right,
+                          onPressed: _gameBoard.moveRight,
+                          size: buttonSize,
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 8),
