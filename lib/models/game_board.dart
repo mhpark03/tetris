@@ -60,8 +60,8 @@ class GameBoard extends ChangeNotifier {
 
   void _startTimer() {
     _gameTimer?.cancel();
-    int speed = 1000 - (level - 1) * 100;
-    if (speed < 100) speed = 100;
+    int speed = 500 - (level - 1) * 50;
+    if (speed < 50) speed = 50;
     _gameTimer = Timer.periodic(Duration(milliseconds: speed), (_) {
       if (!isPaused && !isGameOver) {
         moveDown();
