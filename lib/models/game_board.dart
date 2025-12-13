@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'piece.dart';
 
 class GameBoard extends ChangeNotifier {
   static const int rows = 20;
   static const int cols = 10;
+  static const String _startLevelKey = 'start_level';
 
   // Board state: null means empty, Color means filled
   List<List<Color?>> board = List.generate(
@@ -28,7 +30,20 @@ class GameBoard extends ChangeNotifier {
   static const int maxLevel = 10;
 
   GameBoard() {
+    _loadStartLevel();
     _initGame();
+  }
+
+  Future<void> _loadStartLevel() async {
+    final prefs = await SharedPreferences.getInstance();
+    startLevel = prefs.getInt(_startLevelKey) ?? 1;
+    level = startLevel;
+    notifyListeners();
+  }
+
+  Future<void> _saveStartLevel() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_startLevelKey, startLevel);
   }
 
   void _initGame() {
@@ -48,6 +63,7 @@ class GameBoard extends ChangeNotifier {
   void setStartLevel(int newLevel) {
     if (newLevel >= 1 && newLevel <= maxLevel) {
       startLevel = newLevel;
+      _saveStartLevel();
       notifyListeners();
     }
   }
