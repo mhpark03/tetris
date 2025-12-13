@@ -17,12 +17,15 @@ class GameBoard extends ChangeNotifier {
   Piece? nextPiece;
   int score = 0;
   int level = 1;
+  int startLevel = 1;
   int linesCleared = 0;
   bool isGameOver = false;
   bool isPaused = false;
   Timer? _gameTimer;
 
   final Random _random = Random();
+
+  static const int maxLevel = 10;
 
   GameBoard() {
     _initGame();
@@ -34,12 +37,19 @@ class GameBoard extends ChangeNotifier {
       (_) => List.generate(cols, (_) => null),
     );
     score = 0;
-    level = 1;
+    level = startLevel;
     linesCleared = 0;
     isGameOver = false;
     isPaused = false;
     currentPiece = _generateRandomPiece();
     nextPiece = _generateRandomPiece();
+  }
+
+  void setStartLevel(int newLevel) {
+    if (newLevel >= 1 && newLevel <= maxLevel) {
+      startLevel = newLevel;
+      notifyListeners();
+    }
   }
 
   void startGame() {
@@ -288,9 +298,9 @@ class GameBoard extends ChangeNotifier {
           break;
       }
 
-      // Level up every 10 lines
-      int newLevel = (linesCleared ~/ 10) + 1;
-      if (newLevel > level) {
+      // Level up every 10 lines (from start level)
+      int newLevel = startLevel + (linesCleared ~/ 10);
+      if (newLevel > level && newLevel <= maxLevel) {
         level = newLevel;
         _restartTimer();
       }

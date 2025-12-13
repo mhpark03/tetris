@@ -66,6 +66,99 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  void _showLevelSelectDialog() {
+    _gameBoard.pauseGame();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey.shade900,
+        title: const Text(
+          'SELECT START LEVEL',
+          style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        content: StatefulBuilder(
+          builder: (context, setDialogState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Level ${_gameBoard.startLevel}',
+                style: const TextStyle(color: Colors.white, fontSize: 32),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle, color: Colors.cyan, size: 40),
+                    onPressed: _gameBoard.startLevel > 1
+                        ? () {
+                            _gameBoard.setStartLevel(_gameBoard.startLevel - 1);
+                            setDialogState(() {});
+                          }
+                        : null,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Slider(
+                      value: _gameBoard.startLevel.toDouble(),
+                      min: 1,
+                      max: GameBoard.maxLevel.toDouble(),
+                      divisions: GameBoard.maxLevel - 1,
+                      activeColor: Colors.cyan,
+                      inactiveColor: Colors.grey,
+                      onChanged: (value) {
+                        _gameBoard.setStartLevel(value.toInt());
+                        setDialogState(() {});
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle, color: Colors.cyan, size: 40),
+                    onPressed: _gameBoard.startLevel < GameBoard.maxLevel
+                        ? () {
+                            _gameBoard.setStartLevel(_gameBoard.startLevel + 1);
+                            setDialogState(() {});
+                          }
+                        : null,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Speed: ${1000 - (_gameBoard.startLevel - 1) * 100}ms',
+                style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _gameBoard.pauseGame();
+            },
+            child: const Text(
+              'CANCEL',
+              style: TextStyle(color: Colors.grey, fontSize: 16),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _gameBoard.startGame();
+            },
+            child: const Text(
+              'START GAME',
+              style: TextStyle(color: Colors.cyan, fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showGameOverDialog() {
     showDialog(
       context: context,
@@ -139,6 +232,10 @@ class _GameScreenState extends State<GameScreen> {
           ),
           centerTitle: true,
           actions: [
+            IconButton(
+              icon: const Icon(Icons.settings, color: Colors.white),
+              onPressed: _showLevelSelectDialog,
+            ),
             IconButton(
               icon: Icon(
                 _gameBoard.isPaused ? Icons.play_arrow : Icons.pause,
