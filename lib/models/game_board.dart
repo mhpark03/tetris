@@ -177,6 +177,49 @@ class GameBoard extends ChangeNotifier {
     notifyListeners();
   }
 
+  void rotateLeft() {
+    if (currentPiece == null || isGameOver || isPaused) return;
+
+    currentPiece!.rotateBack();
+    if (!_isValidPosition(currentPiece!)) {
+      // Try wall kick
+      int originalX = currentPiece!.x;
+
+      // Try moving left
+      currentPiece!.x--;
+      if (_isValidPosition(currentPiece!)) {
+        notifyListeners();
+        return;
+      }
+
+      // Try moving right
+      currentPiece!.x = originalX + 1;
+      if (_isValidPosition(currentPiece!)) {
+        notifyListeners();
+        return;
+      }
+
+      // Try moving 2 left (for I piece)
+      currentPiece!.x = originalX - 2;
+      if (_isValidPosition(currentPiece!)) {
+        notifyListeners();
+        return;
+      }
+
+      // Try moving 2 right (for I piece)
+      currentPiece!.x = originalX + 2;
+      if (_isValidPosition(currentPiece!)) {
+        notifyListeners();
+        return;
+      }
+
+      // Rotation not possible, revert
+      currentPiece!.x = originalX;
+      currentPiece!.rotate();
+    }
+    notifyListeners();
+  }
+
   void _placePiece() {
     if (currentPiece == null) return;
 
