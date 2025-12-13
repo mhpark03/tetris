@@ -214,38 +214,30 @@ class _GameScreenState extends State<GameScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Left controls
-                    Row(
-                      children: [
-                        HoldControlButton(
-                          icon: Icons.arrow_left,
-                          onPressed: _gameBoard.moveLeft,
-                        ),
-                        const SizedBox(width: 8),
-                        HoldControlButton(
-                          icon: Icons.arrow_right,
-                          onPressed: _gameBoard.moveRight,
-                        ),
-                      ],
+                    // Move left
+                    HoldControlButton(
+                      icon: Icons.arrow_left,
+                      onPressed: _gameBoard.moveLeft,
                     ),
-                    // Rotate
+                    // Rotate left
+                    ControlButton(
+                      icon: Icons.rotate_left,
+                      onPressed: _gameBoard.rotateLeft,
+                    ),
+                    // Hard drop
+                    ControlButton(
+                      icon: Icons.vertical_align_bottom,
+                      onPressed: _gameBoard.hardDrop,
+                    ),
+                    // Rotate right
                     ControlButton(
                       icon: Icons.rotate_right,
                       onPressed: _gameBoard.rotate,
                     ),
-                    // Down controls
-                    Row(
-                      children: [
-                        HoldControlButton(
-                          icon: Icons.arrow_drop_down,
-                          onPressed: _gameBoard.moveDown,
-                        ),
-                        const SizedBox(width: 8),
-                        ControlButton(
-                          icon: Icons.vertical_align_bottom,
-                          onPressed: _gameBoard.hardDrop,
-                        ),
-                      ],
+                    // Move right
+                    HoldControlButton(
+                      icon: Icons.arrow_right,
+                      onPressed: _gameBoard.moveRight,
                     ),
                   ],
                 ),
