@@ -281,7 +281,7 @@ class _GameScreenState extends State<GameScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final buttonSize = (constraints.maxWidth - 32) / 5;
+              final buttonSize = (constraints.maxWidth - 24) / 4;
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -298,11 +298,6 @@ class _GameScreenState extends State<GameScreen> {
                   ControlButton(
                     icon: Icons.vertical_align_bottom,
                     onPressed: _gameBoard.hardDrop,
-                    size: buttonSize,
-                  ),
-                  ControlButton(
-                    icon: Icons.rotate_right,
-                    onPressed: _gameBoard.rotate,
                     size: buttonSize,
                   ),
                   HoldControlButton(
