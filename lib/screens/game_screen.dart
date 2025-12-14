@@ -219,9 +219,263 @@ class _GameScreenState extends State<GameScreen> {
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
         backgroundColor: Colors.grey.shade900,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: const Text(
+        body: SafeArea(
+          child: OrientationBuilder(
+            builder: (context, orientation) {
+              if (orientation == Orientation.landscape) {
+                return _buildLandscapeLayout();
+              } else {
+                return _buildPortraitLayout();
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPortraitLayout() {
+    return Column(
+      children: [
+        // App bar replacement
+        _buildAppBar(),
+        // Score and info section
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildInfoBox('SCORE', _gameBoard.score.toString()),
+              _buildInfoBox('LEVEL', _gameBoard.level.toString()),
+              _buildInfoBox('LINES', _gameBoard.linesCleared.toString()),
+            ],
+          ),
+        ),
+        // Game board and next piece
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Game board
+                Expanded(
+                  flex: 3,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 300),
+                      child: _buildGameBoardWithPause(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Next piece
+                NextPieceWidget(piece: _gameBoard.nextPiece),
+              ],
+            ),
+          ),
+        ),
+        // Controls
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final buttonSize = (constraints.maxWidth - 32) / 5;
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  HoldControlButton(
+                    icon: Icons.arrow_left,
+                    onPressed: _gameBoard.moveLeft,
+                    size: buttonSize,
+                  ),
+                  ControlButton(
+                    icon: Icons.rotate_left,
+                    onPressed: _gameBoard.rotateLeft,
+                    size: buttonSize,
+                  ),
+                  ControlButton(
+                    icon: Icons.vertical_align_bottom,
+                    onPressed: _gameBoard.hardDrop,
+                    size: buttonSize,
+                  ),
+                  ControlButton(
+                    icon: Icons.rotate_right,
+                    onPressed: _gameBoard.rotate,
+                    size: buttonSize,
+                  ),
+                  HoldControlButton(
+                    icon: Icons.arrow_right,
+                    onPressed: _gameBoard.moveRight,
+                    size: buttonSize,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _buildLandscapeLayout() {
+    return Row(
+      children: [
+        // Left controls
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0, right: 0),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final buttonSize = (constraints.maxWidth / 3.8).clamp(45.0, 70.0);
+                return Column(
+                  children: [
+                    // Title on left side
+                    const Text(
+                      'TETRIS',
+                      style: TextStyle(
+                        color: Colors.cyan,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                        letterSpacing: 4,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Score on first row (full width)
+                    Row(
+                      children: [
+                        Expanded(child: _buildCompactInfoBox('SCORE', _gameBoard.score.toString())),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Level and Lines on second row
+                    Row(
+                      children: [
+                        Expanded(child: _buildCompactInfoBox('LV', _gameBoard.level.toString())),
+                        const SizedBox(width: 4),
+                        Expanded(child: _buildCompactInfoBox('LINE', _gameBoard.linesCleared.toString())),
+                      ],
+                    ),
+                    const Spacer(),
+                    // Left control buttons (horizontal)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        HoldControlButton(
+                          icon: Icons.arrow_left,
+                          onPressed: _gameBoard.moveLeft,
+                          size: buttonSize,
+                        ),
+                        SizedBox(width: buttonSize * 0.15),
+                        ControlButton(
+                          icon: Icons.rotate_left,
+                          onPressed: _gameBoard.rotateLeft,
+                          size: buttonSize,
+                        ),
+                        SizedBox(width: buttonSize * 0.15),
+                        ControlButton(
+                          icon: Icons.vertical_align_bottom,
+                          onPressed: _gameBoard.hardDrop,
+                          size: buttonSize,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 80),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+        // Center - Game board (fills full height)
+        Expanded(
+          flex: 3,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Center(
+              child: _buildGameBoardWithPause(),
+            ),
+          ),
+        ),
+        // Right controls
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 0, top: 8.0, bottom: 8.0, right: 8.0),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final buttonSize = (constraints.maxWidth / 3.8).clamp(45.0, 70.0);
+                return Column(
+                  children: [
+                    // Settings and pause buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.settings, color: Colors.white, size: 28),
+                          onPressed: _showLevelSelectDialog,
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: Icon(
+                            _gameBoard.isPaused ? Icons.play_arrow : Icons.pause,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                          onPressed: _gameBoard.pauseGame,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Next piece on right side
+                    NextPieceWidget(piece: _gameBoard.nextPiece),
+                    const Spacer(),
+                    // Right control buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        HoldControlButton(
+                          icon: Icons.arrow_drop_down,
+                          onPressed: _gameBoard.moveDown,
+                          size: buttonSize,
+                        ),
+                        SizedBox(width: buttonSize * 0.15),
+                        ControlButton(
+                          icon: Icons.rotate_right,
+                          onPressed: _gameBoard.rotate,
+                          size: buttonSize,
+                        ),
+                        SizedBox(width: buttonSize * 0.15),
+                        HoldControlButton(
+                          icon: Icons.arrow_right,
+                          onPressed: _gameBoard.moveRight,
+                          size: buttonSize,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 80),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAppBar() {
+    return Container(
+      color: Colors.black,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const SizedBox(width: 48),
+          const Text(
             'TETRIS',
             style: TextStyle(
               color: Colors.cyan,
@@ -230,123 +484,78 @@ class _GameScreenState extends State<GameScreen> {
               letterSpacing: 4,
             ),
           ),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
-              onPressed: _showLevelSelectDialog,
-            ),
-            IconButton(
-              icon: Icon(
-                _gameBoard.isPaused ? Icons.play_arrow : Icons.pause,
-                color: Colors.white,
-              ),
-              onPressed: _gameBoard.pauseGame,
-            ),
-          ],
-        ),
-        body: SafeArea(
-          child: Column(
+          Row(
             children: [
-              // Score and info section
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildInfoBox('SCORE', _gameBoard.score.toString()),
-                    _buildInfoBox('LEVEL', _gameBoard.level.toString()),
-                    _buildInfoBox('LINES', _gameBoard.linesCleared.toString()),
-                  ],
-                ),
+              IconButton(
+                icon: const Icon(Icons.settings, color: Colors.white),
+                onPressed: _showLevelSelectDialog,
               ),
-              // Game board and next piece
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Game board
-                      Expanded(
-                        flex: 3,
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 300),
-                            child: Stack(
-                              children: [
-                                GameBoardWidget(gameBoard: _gameBoard),
-                                if (_gameBoard.isPaused)
-                                  Positioned.fill(
-                                    child: Container(
-                                      color: Colors.black54,
-                                      child: const Center(
-                                        child: Text(
-                                          'PAUSED',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 32,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      // Next piece
-                      NextPieceWidget(piece: _gameBoard.nextPiece),
-                    ],
+              IconButton(
+                icon: Icon(
+                  _gameBoard.isPaused ? Icons.play_arrow : Icons.pause,
+                  color: Colors.white,
+                ),
+                onPressed: _gameBoard.pauseGame,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGameBoardWithPause() {
+    return Stack(
+      children: [
+        GameBoardWidget(gameBoard: _gameBoard),
+        if (_gameBoard.isPaused)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black54,
+              child: const Center(
+                child: Text(
+                  'PAUSED',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              // Controls
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final buttonSize = (constraints.maxWidth - 24) / 4; // 4 buttons with gaps
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Move left
-                        HoldControlButton(
-                          icon: Icons.arrow_left,
-                          onPressed: _gameBoard.moveLeft,
-                          size: buttonSize,
-                        ),
-                        // Rotate left
-                        ControlButton(
-                          icon: Icons.rotate_left,
-                          onPressed: _gameBoard.rotateLeft,
-                          size: buttonSize,
-                        ),
-                        // Hard drop
-                        ControlButton(
-                          icon: Icons.vertical_align_bottom,
-                          onPressed: _gameBoard.hardDrop,
-                          size: buttonSize,
-                        ),
-                        // Move right
-                        HoldControlButton(
-                          icon: Icons.arrow_right,
-                          onPressed: _gameBoard.moveRight,
-                          size: buttonSize,
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
+            ),
           ),
-        ),
+      ],
+    );
+  }
+
+  Widget _buildCompactInfoBox(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.cyan, width: 2),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey.shade400,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
